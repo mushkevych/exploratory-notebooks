@@ -1,0 +1,13 @@
+ticket_id,customer_segment,product_area,severity,status,resolution_hours,csat_score,description
+T-1001,Enterprise,Authentication,High,Open,,,SSO login failures after identity provider certificate rotation
+T-1002,SMB,Dashboard,Medium,Closed,9.5,4,Dashboard filter state not preserved after page refresh
+T-1003,Enterprise,API,Critical,Open,,,Elevated API 500 errors for batch scoring endpoint
+T-1004,Mid-market,Billing,Low,Closed,18.0,5,Invoice export column order differs from expected template
+T-1005,Enterprise,Data Pipeline,High,In Progress,,,Delayed nightly ingestion caused stale executive dashboard
+T-1006,SMB,Authentication,Medium,Closed,6.0,3,Password reset email delivery delayed for several users
+T-1007,Mid-market,API,Medium,Closed,12.5,4,API pagination behavior unclear in documentation
+T-1008,Enterprise,Dashboard,High,Open,,,Revenue dashboard differs from finance export by 12%
+T-1009,SMB,Billing,Low,Closed,4.0,5,Request to add purchase order number to invoice PDF
+T-1010,Enterprise,Data Pipeline,Critical,In Progress,,,Production feature table missing latest partition
+T-1011,Mid-market,Authentication,Low,Closed,3.0,5,Clarification requested on MFA enrollment policy
+T-1012,SMB,Dashboard,Medium,Open,,,Chart loads slowly when date range exceeds twelve months

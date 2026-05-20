@@ -1,0 +1,98 @@
+services:
+  openclaw:
+    image: ghcr.io/openclaw/openclaw:main
+    container_name: openclaw
+    platform: linux/arm64
+    init: true
+
+    environment:
+      HOME: /home/node
+      TERM: xterm-256color
+      PATH: /home/node/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+      OLLAMA_BASE_URL: http://host.docker.internal:11434
+      MODEL: ollama/llama3.1:8b
+      OPENCLAW_GATEWAY_TOKEN: change-this-long-random-token
+
+    command:
+      - sh
+      - -lc
+      - |
+        mkdir -p /home/node/.local/bin
+
+        if command -v python3 >/dev/null 2>&1; then
+          ln -sf "$(command -v python3)" /home/node/.local/bin/python
+        else
+          echo "ERROR: python3 not found in image"
+          exit 1
+        fi
+
+        mkdir -p /home/node/.openclaw
+
+        # 1. Write the explicit host execution approvals
+        cat > /home/node/.openclaw/exec-approvals.json <<EOF
+        {
+          "version": 1,
+          "defaults": {
+            "security": "full",
+            "ask": "off"
+          }
+        }
+        EOF
+
+        # 2. Update openclaw.json with the tools.exec config
+        cat > /home/node/.openclaw/openclaw.json <<EOF
+        {
+          "gateway": {
+            "mode": "local",
+            "bind": "lan",
+            "port": 18789,
+            "auth": {
+              "mode": "token",
+              "token": "$${OPENCLAW_GATEWAY_TOKEN}"
+            },
+            "controlUi": {
+              "dangerouslyAllowHostHeaderOriginFallback": true,
+              "dangerouslyDisableDeviceAuth": true
+            }
+          },
+          "models": {
+            "providers": {
+              "ollama": {
+                "baseUrl": "http://host.docker.internal:11434",
+                "apiKey": "ollama-local",
+                "models": [
+                  {
+                    "id": "llama3.1:8b",
+                    "name": "Llama 3.1 8B",
+                    "contextWindow": 65536
+                  }
+                ]
+              }
+            }
+          },
+          "agents": {
+            "defaults": {
+              "model": "ollama/llama3.1:8b"
+            }
+          },
+          "tools": {
+            "exec": {
+              "host": "gateway",
+              "security": "full",
+              "ask": "off"
+            }
+          }        
+        }
+        EOF
+        
+        exec node dist/index.js gateway --bind lan --port 18789
+
+    ports:
+      - "3030:18789"
+      - "3031:18790"
+
+    volumes:
+      - ./openclaw/data:/home/node/.openclaw
+      - ./openclaw/workspace:/home/node/.openclaw/workspace
+
+    restart: unless-stopped
