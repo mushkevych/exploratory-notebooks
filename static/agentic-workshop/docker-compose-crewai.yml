@@ -1,0 +1,23 @@
+services:
+  crewai-demo:
+    build:
+      context: ./crewai-src
+      dockerfile: Dockerfile
+
+    container_name: crewai-demo
+    platform: linux/arm64
+    working_dir: /app
+    volumes:
+      - ./crewai-src:/app
+      - ./crewai-workspace:/app/workspace
+
+    environment:
+      OLLAMA_BASE_URL: http://host.docker.internal:11434
+      CREWAI_TRACING_ENABLED: "false"
+      CREWAI_DISABLE_TELEMETRY: "true"
+      OTEL_SDK_DISABLED: "true"
+      PYTHONUNBUFFERED: "1"
+      PYTHONIOENCODING: "utf-8"
+
+    command: ["bash"]
+    restart: "no"
